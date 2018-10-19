@@ -3,7 +3,7 @@ import dotEnvExpand from 'dotenv-expand';
 import fs from 'fs';
 import path from 'path';
 
-const { NODE_ENV } = process.env;
+const { NODE_ENV } = process.env as { NODE_ENV: string };
 
 if (!NODE_ENV) {
   throw new Error(

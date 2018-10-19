@@ -1,1 +1,2 @@
 # import Query.* from "./typeDefs/welcome.graphql"
+# import Query.*, Mutation.* from "./typeDefs/user.graphql"

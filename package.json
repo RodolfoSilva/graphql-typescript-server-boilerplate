@@ -7,7 +7,8 @@
   "scripts": {
     "start": "cross-env DEBUG=server* NODE_ENV=development nodemon -e ts,graphql -x ts-node src/server.ts",
     "debug": "cross-env DEBUG=server* NODE_ENV=development nodemon -e ts,graphql -x ts-node --inspect src/server.ts",
-    "build": "cross-env NODE_ENV=production rimraf dist && tsc"
+    "build": "cross-env NODE_ENV=production rimraf dist && tsc",
+    "lint": "tslint -p tsconfig.json"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -33,6 +34,7 @@
     "@types/graphql": "^14.0.3",
     "@types/jest": "^23.3.5",
     "@types/jsonwebtoken": "^7.2.8",
+    "@types/lodash": "^4.14.117",
     "@types/mongodb": "^3.1.12",
     "@types/mongoose": "^5.2.19",
     "@types/node": "^10.12.0",
@@ -58,7 +60,7 @@
   },
   "lint-staged": {
     "src/**/*.ts": [
-      "tslint -p tsconfig.json --fix",
+      "yarn lint --fix",
       "prettier --parser typescript --write",
       "git add"
     ]

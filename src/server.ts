@@ -4,29 +4,38 @@ import { Options, Props } from 'graphql-yoga/dist/types';
 import path from 'path';
 
 import './config/env';
+import connectMongoose from './config/mongoose';
 import resolvers from './graphql/resolvers';
+import './models';
 import customRoutes from './routes';
 
-const debug: IDebugger = createDebug('server');
+(async () => {
+  await connectMongoose();
 
-const graphqlServerProps: Props = {
-  resolvers,
-  typeDefs: path.join(__dirname, './graphql/schema.graphql')
-};
+  const debug: IDebugger = createDebug('server');
 
-const server = new GraphQLServer(graphqlServerProps);
+  const graphqlServerProps: Props = {
+    context: req => ({
+      ...req
+    }),
+    resolvers,
+    typeDefs: path.join(__dirname, './graphql/schema.graphql')
+  };
 
-const serverOptions: Options = {
-  port: process.env.PORT
-};
+  const server = new GraphQLServer(graphqlServerProps);
 
-server.use(customRoutes);
+  const serverOptions: Options = {
+    port: Number(process.env.PORT)
+  };
 
-server.start(serverOptions, options => {
-  debug(
-    `Server is running on localhost:%d and GraphQl Server on localhost:%d%s`,
-    options.port,
-    options.port,
-    options.endpoint
-  );
-});
+  server.use(customRoutes);
+
+  server.start(serverOptions, options => {
+    debug(
+      `Server is running on localhost:%d and GraphQl Server on localhost:%d%s`,
+      options.port,
+      options.port,
+      options.endpoint
+    );
+  });
+})();
