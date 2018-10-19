@@ -2,6 +2,13 @@
 
 > Plug and play \o/
 
+## Features
+
+* GraphQl
+* Authentication
+* Express routes
+* Integration with mongoose
+
 ## Contributing
 
 Issues and Pull Requests are always welcome.
