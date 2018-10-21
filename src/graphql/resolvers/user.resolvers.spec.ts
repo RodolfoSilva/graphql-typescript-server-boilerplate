@@ -247,5 +247,25 @@ describe('User resolvers', () => {
         }),
       );
     });
+
+    it('Should return error when user not exists', async () => {
+      const { body: response } = await request
+        .post('/')
+        .set(
+          'Authorization',
+          `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1YmM5NDE1MTliODgyNTNiNzFmNWE1NjkiLCJpYXQiOjE1Mzk5MTY3NjN9.OQU2GoailFmxhQSNy6ahZk39cNDZC-z_vnovmPONO-4`,
+        )
+        .send({ query });
+
+      expect(response).toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: 'Not authorized',
+            }),
+          ],
+        }),
+      );
+    });
   });
 });
