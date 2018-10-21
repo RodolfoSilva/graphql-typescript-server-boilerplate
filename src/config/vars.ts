@@ -1,14 +1,10 @@
 import './env';
+import checkEnvs, { IEnvironments } from '../utils/checkEnvs';
 
-const requiredEnvs = ['NODE_ENV', 'APP_SECRET', 'MONGO_URI'];
-
-for (const requiredEnv of requiredEnvs) {
-  if (!process.env[requiredEnv]) {
-    throw new Error(
-      `The ${requiredEnv} environment variable is required but was not specified.`,
-    );
-  }
-}
+checkEnvs(
+  ['NODE_ENV', 'APP_SECRET', 'MONGO_URI'],
+  process.env as IEnvironments,
+);
 
 export const env: string = process.env.NODE_ENV as string;
 export const isDevelopment: boolean = env === 'development';

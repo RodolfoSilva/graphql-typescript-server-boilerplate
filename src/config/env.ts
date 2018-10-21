@@ -3,14 +3,6 @@ import dotEnvExpand from 'dotenv-expand';
 import fs from 'fs';
 import path from 'path';
 
-const { NODE_ENV } = process.env as { NODE_ENV: string };
-
-if (!NODE_ENV) {
-  throw new Error(
-    'The NODE_ENV environment variable is required but was not specified.'
-  );
-}
-
 interface ILoadOptions {
   basePath: string;
   env: string;
@@ -20,7 +12,7 @@ interface ILoadOptions {
 const loadEnvironment = ({
   basePath,
   env,
-  dotEnvFileName = '.env'
+  dotEnvFileName = '.env',
 }: ILoadOptions): void => {
   // https://github.com/bkeepers/dotenv#what-other-env-files-can-i-use
   const dotEnvFiles: string[] = [
@@ -30,7 +22,7 @@ const loadEnvironment = ({
     // since normally you expect __tests__ to produce the same
     // results for everyone
     env !== 'test' ? `${dotEnvFileName}.local` : '',
-    dotEnvFileName
+    dotEnvFileName,
   ];
 
   // Load environment variables from .env* files. Suppress warnings using silent
@@ -49,5 +41,5 @@ const loadEnvironment = ({
 
 loadEnvironment({
   basePath: path.resolve(path.join(__dirname, '../../')),
-  env: NODE_ENV
+  env: process.env.NODE_ENV as string,
 });
