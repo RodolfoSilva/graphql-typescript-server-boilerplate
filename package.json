@@ -81,8 +81,7 @@
     "globalSetup": "./scripts/jest-globalSetup.js",
     "globalTeardown": "./scripts/jest-globalTeardown.js",
     "preset": "ts-jest",
-    "coverageDirectory": "./coverage/",
-    "collectCoverage": true
+    "coverageDirectory": "./coverage/"
   },
   "lint-staged": {
     "src/**/*.ts": [

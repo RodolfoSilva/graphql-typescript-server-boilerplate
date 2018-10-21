@@ -12,4 +12,4 @@ node_js:
   - "8"
 script:
   - yarn run lint
-  - yarn run test && codecov
+  - yarn run test --coverage && codecov
