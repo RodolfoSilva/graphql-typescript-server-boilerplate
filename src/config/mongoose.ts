@@ -16,14 +16,7 @@ mongoose.connection.on('disconnected', () =>
 
 mongoose.connection.on('error', error => {
   debug(`Mongoose default connection error: ${error}`);
-  process.exit(-1);
-});
-
-process.on('SIGINT', () => {
-  mongoose.connection.close(() => {
-    debug('Mongoose default connection disconnected through app termination');
-    process.exit(0);
-  });
+  process.exit(1);
 });
 
 mongoose.set('debug', vars.isDevelopment);
