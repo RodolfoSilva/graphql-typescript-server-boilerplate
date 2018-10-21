@@ -1,3 +1,4 @@
+import faker from 'faker';
 import superTest from 'supertest';
 import { User } from '../../models';
 import { IUserDocument } from '../../models/user.model';
@@ -18,16 +19,23 @@ describe('User resolvers', () => {
   });
 
   beforeEach(async () => {
+    if (dbUsers) {
+      await User.deleteMany({
+        email: {
+          $in: [user.email, dbUsers.branStark.email, dbUsers.jonSnow.email],
+        },
+      });
+    }
     dbUsers = {
       branStark: {
-        email: 'branstark@gmail.com',
-        name: 'Bran Stark',
+        email: faker.internet.email(faker.name.findName()).toLowerCase(),
+        name: faker.name.findName(),
         password: passwordHashed,
         roles: ['user'],
       },
       jonSnow: {
-        email: 'jonsnow@gmail.com',
-        name: 'Jon Snow',
+        email: faker.internet.email(faker.name.findName()).toLowerCase(),
+        name: faker.name.findName(),
         password: passwordHashed,
         roles: ['admin'],
       },
@@ -40,7 +48,6 @@ describe('User resolvers', () => {
       roles: ['admin'],
     };
 
-    await User.deleteMany({});
     await User.insertMany(Object.values(dbUsers));
     const dbUser = await User.findOne({ email: dbUsers.jonSnow.email });
 

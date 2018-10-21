@@ -1,10 +1,10 @@
 import * as bcrypt from 'bcryptjs';
 import isEmpty from 'lodash/isEmpty';
 import { Document, model, Model, Schema, SchemaOptions } from 'mongoose';
+import * as vars from '../config/vars';
 
 const generatePasswordHash = async (password: string): Promise<string> => {
-  const rounds: number = process.env.NODE_ENV === 'test' ? 1 : 10;
-  return await bcrypt.hash(password, rounds);
+  return await bcrypt.hash(password, vars.saltRounds);
 };
 
 const schemaOptions: SchemaOptions = {
@@ -59,11 +59,11 @@ export interface IUserDocument extends Document {
 }
 
 export interface IUserModel extends Model<IUserDocument> {
-  getByEmail: (email: string) => Promise<IUserDocument | undefined | null>;
+  getByEmail: (email: string) => Promise<IUserDocument | null>;
   getByEmailAndPassword: (
     email: string,
     password: string,
-  ) => Promise<IUserDocument | undefined>;
+  ) => Promise<IUserDocument | null>;
   generatePasswordHash: (password: string) => Promise<string>;
 }
 
@@ -75,9 +75,9 @@ UserSchema.methods.comparePassword = function comparePassword(
 
 UserSchema.statics.getByEmail = async function getByEmail(
   email: string,
-): Promise<IUserDocument | undefined | null> {
+): Promise<IUserDocument | null> {
   if (isEmpty(email)) {
-    return undefined;
+    return null;
   }
 
   return await this.findOne(
@@ -91,15 +91,15 @@ UserSchema.statics.getByEmail = async function getByEmail(
 UserSchema.statics.getByEmailAndPassword = async function getByEmailAndPassword(
   email: string,
   password: string,
-): Promise<IUserDocument | undefined> {
+): Promise<IUserDocument | null> {
   if (isEmpty(email) || isEmpty(password)) {
-    return undefined;
+    return null;
   }
 
-  const user: IUserDocument | undefined | null = await this.getByEmail(email);
+  const user: IUserDocument | null = await this.getByEmail(email);
 
   if (!user || !user.comparePassword(password)) {
-    return undefined;
+    return null;
   }
 
   return user;
