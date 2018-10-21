@@ -20,13 +20,9 @@
 
 Issues and Pull Requests are always welcome.
 
-## License
-
-MIT © 2018 Rodolfo Silva!, https://rodolfosilva.com
-
 ## LICENSE
 
-MIT
+MIT © 2018 Rodolfo Silva!, https://rodolfosilva.com
 
 [build-badge]: https://img.shields.io/travis/com/RodolfoSilva/graphql-typescript-server-boilerplate.svg?style=flat-square
 [build]: https://travis-ci.com/RodolfoSilva/graphql-typescript-server-boilerplate
