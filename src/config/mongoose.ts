@@ -10,10 +10,12 @@ mongoose.connection.on('connected', () =>
   debug(`Mongoose default connection open to ${vars.mongo}`),
 );
 
+/* istanbul ignore next */
 mongoose.connection.on('disconnected', () =>
   debug('Mongoose default connection disconnected'),
 );
 
+/* istanbul ignore next */
 mongoose.connection.on('error', error => {
   debug(`Mongoose default connection error: ${error}`);
   process.exit(1);
