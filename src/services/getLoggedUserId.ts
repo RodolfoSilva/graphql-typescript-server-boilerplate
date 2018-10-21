@@ -2,14 +2,7 @@ import * as jwt from 'jsonwebtoken';
 import { Types } from 'mongoose';
 import { AuthError } from '../errors/AuthError';
 import { IContext } from '../graphql/types/Context';
-
-const { APP_SECRET } = process.env as { APP_SECRET: string };
-
-if (!APP_SECRET) {
-  throw new Error(
-    'The APP_SECRET environment variable is required but was not specified.'
-  );
-}
+import * as vars from '../config/vars';
 
 const getLoggedUserId = ({ request }: IContext): Types.ObjectId => {
   const authorization = request.get('Authorization');
@@ -20,7 +13,7 @@ const getLoggedUserId = ({ request }: IContext): Types.ObjectId => {
 
   const token: string = authorization.trim().split(' ')[1];
 
-  const { userId } = jwt.verify(token, APP_SECRET) as { userId: string };
+  const { userId } = jwt.verify(token, vars.appSecret) as { userId: string };
   return Types.ObjectId(userId);
 };
 
