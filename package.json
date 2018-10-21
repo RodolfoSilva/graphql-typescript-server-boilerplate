@@ -61,7 +61,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "yarn run test && lint-staged"
     }
   },
   "jest": {
@@ -85,7 +85,7 @@
   },
   "lint-staged": {
     "src/**/*.ts": [
-      "yarn lint --fix",
+      "yarn run lint --fix",
       "prettier --parser typescript --write",
       "git add"
     ]
