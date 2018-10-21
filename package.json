@@ -19,7 +19,6 @@
     "dotenv-expand": "^4.2.0",
     "express": "^4.16.4",
     "graphql": "^14.0.2",
-    "graphql-tag": "^2.10.0",
     "graphql-yoga": "^1.16.6",
     "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.11",

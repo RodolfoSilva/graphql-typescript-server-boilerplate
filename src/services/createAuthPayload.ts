@@ -5,18 +5,31 @@ const { APP_SECRET } = process.env as { APP_SECRET: string };
 
 if (!APP_SECRET) {
   throw new Error(
-    'The APP_SECRET environment variable is required but was not specified.'
+    'The APP_SECRET environment variable is required but was not specified.',
   );
 }
 
 export interface IAuthPayload {
-  token: string;
+  token: {
+    access_token: string;
+    token_type: string;
+    expires_in: number;
+  };
   user: IUserDocument;
 }
 
-const createAuthPayload = (user: IUserDocument) => ({
-  token: jwt.sign({ userId: user.id }, APP_SECRET),
-  user
-});
+const createAuthPayload = (user: IUserDocument) => {
+  const accessToken: string = jwt.sign({ userId: user.id }, APP_SECRET);
+  const { iat } = jwt.decode(accessToken) as { iat: number };
+
+  return {
+    token: {
+      access_token: accessToken,
+      token_type: 'Bearer',
+      expires_in: iat,
+    },
+    user,
+  };
+};
 
 export default createAuthPayload;

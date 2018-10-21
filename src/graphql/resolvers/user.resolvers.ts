@@ -3,7 +3,7 @@ import { User } from '../../models';
 import { IUserDocument } from '../../models/user.model';
 import {
   default as createAuthPayload,
-  IAuthPayload
+  IAuthPayload,
 } from '../../services/createAuthPayload';
 import getLoggedUser from '../../services/getLoggedUser';
 import { IContext } from '../types/Context';
@@ -24,7 +24,7 @@ export default {
     },
     signup: async (
       _: any,
-      { name, email, password, permissions }: any
+      { name, email, password, roles }: any,
     ): Promise<IAuthPayload> => {
       if (await User.getByEmail(email)) {
         throw new Error(`Has an user registered with this email: ${email}`);
@@ -34,13 +34,13 @@ export default {
         email,
         name,
         password: await User.generatePasswordHash(password),
-        permissions
+        roles,
       });
       return createAuthPayload(user);
-    }
+    },
   },
   Query: {
     me: async (_: any, {}, ctx: IContext): Promise<IUserDocument> =>
-      await getLoggedUser(ctx)
-  }
+      await getLoggedUser(ctx),
+  },
 };

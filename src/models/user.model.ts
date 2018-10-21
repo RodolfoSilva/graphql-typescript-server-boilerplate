@@ -10,11 +10,11 @@ const generatePasswordHash = async (password: string): Promise<string> => {
 const schemaOptions: SchemaOptions = {
   timestamps: true,
   toJSON: {
-    virtuals: true
+    virtuals: true,
   },
   toObject: {
-    virtuals: true
-  }
+    virtuals: true,
+  },
 };
 
 const UserSchema: Schema = new Schema(
@@ -24,13 +24,13 @@ const UserSchema: Schema = new Schema(
       match: /^\S+@\S+\.\S+$/,
       required: true,
       type: String,
-      unique: true
+      unique: true,
     },
     name: {
       index: true,
       maxlength: 200,
       trim: true,
-      type: String
+      type: String,
     },
     password: {
       maxlength: 128,
@@ -38,23 +38,23 @@ const UserSchema: Schema = new Schema(
       required: true,
       select: false,
       trim: true,
-      type: String
+      type: String,
     },
-    permissions: {
+    roles: {
       default: [],
       enum: ['user', 'admin'],
       required: true,
-      type: [String]
-    }
+      type: [String],
+    },
   },
-  schemaOptions
+  schemaOptions,
 );
 
 export interface IUserDocument extends Document {
   email: string;
   name: string;
   password: string;
-  permissions: string[];
+  roles: string[];
   comparePassword: (password: string) => boolean;
 }
 
@@ -62,19 +62,19 @@ export interface IUserModel extends Model<IUserDocument> {
   getByEmail: (email: string) => Promise<IUserDocument | undefined | null>;
   getByEmailAndPassword: (
     email: string,
-    password: string
+    password: string,
   ) => Promise<IUserDocument | undefined>;
   generatePasswordHash: (password: string) => Promise<string>;
 }
 
 UserSchema.methods.comparePassword = function comparePassword(
-  password: string
+  password: string,
 ): boolean {
   return bcrypt.compareSync(password, this.password);
 };
 
 UserSchema.statics.getByEmail = async function getByEmail(
-  email: string
+  email: string,
 ): Promise<IUserDocument | undefined | null> {
   if (isEmpty(email)) {
     return undefined;
@@ -82,15 +82,15 @@ UserSchema.statics.getByEmail = async function getByEmail(
 
   return await this.findOne(
     {
-      email: new RegExp(`^${email}$`, 'i')
+      email: new RegExp(`^${email}$`, 'i'),
     },
-    '+password'
+    '+password',
   );
 };
 
 UserSchema.statics.getByEmailAndPassword = async function getByEmailAndPassword(
   email: string,
-  password: string
+  password: string,
 ): Promise<IUserDocument | undefined> {
   if (isEmpty(email) || isEmpty(password)) {
     return undefined;
@@ -109,7 +109,7 @@ UserSchema.statics.generatePasswordHash = generatePasswordHash;
 
 const UserModel: IUserModel = model<IUserDocument, IUserModel>(
   'User',
-  UserSchema
+  UserSchema,
 );
 
 export default UserModel;

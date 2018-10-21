@@ -1,5 +1,5 @@
 import createDebug, { IDebugger } from 'debug';
-import mongoose, { Connection } from 'mongoose';
+import mongoose from 'mongoose';
 
 const debug: IDebugger = createDebug('server');
 
@@ -10,7 +10,7 @@ const { MONGO_URI, NODE_ENV } = process.env as {
 
 if (!NODE_ENV) {
   throw new Error(
-    'The NODE_ENV environment variable is required but was not specified.'
+    'The NODE_ENV environment variable is required but was not specified.',
   );
 }
 
@@ -18,11 +18,11 @@ mongoose.Promise = global.Promise;
 
 if (NODE_ENV !== 'test') {
   mongoose.connection.on('connected', () =>
-    debug(`Mongoose default connection open to ${MONGO_URI}`)
+    debug(`Mongoose default connection open to ${MONGO_URI}`),
   );
 
   mongoose.connection.on('disconnected', () =>
-    debug('Mongoose default connection disconnected')
+    debug('Mongoose default connection disconnected'),
   );
 
   mongoose.connection.on('error', error => {
@@ -44,22 +44,16 @@ if (NODE_ENV === 'development') {
 
 mongoose.set('useCreateIndex', true);
 
-const connect = async (): Promise<Connection> => {
-  if (!MONGO_URI) {
-    throw new Error(
-      'The MONGO_URI environment variable is required but was not specified.'
-    );
-  }
-
-  await mongoose.connect(
-    MONGO_URI,
-    {
-      keepAlive: 1,
-      useNewUrlParser: true
-    }
+if (!MONGO_URI) {
+  throw new Error(
+    'The MONGO_URI environment variable is required but was not specified.',
   );
+}
 
-  return mongoose.connection;
-};
-
-export default connect;
+mongoose.connect(
+  MONGO_URI,
+  {
+    keepAlive: 1,
+    useNewUrlParser: true,
+  },
+);
