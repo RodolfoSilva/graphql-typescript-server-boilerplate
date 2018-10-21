@@ -1,5 +1,7 @@
 import superTest from 'supertest';
 import { User } from '../../models';
+import { IUserDocument } from '../../models/user.model';
+import { createToken } from '../../services/createAuthPayload';
 import serverInstance from '../../testServer';
 
 const request = superTest(serverInstance);
@@ -8,7 +10,7 @@ describe('User resolvers', () => {
   let dbUsers: any;
   let passwordHashed: string;
   let user: any;
-  // let token: string;
+  let token: string;
   const password = 'mypassword';
 
   beforeAll(async () => {
@@ -40,9 +42,9 @@ describe('User resolvers', () => {
 
     await User.deleteMany({});
     await User.insertMany(Object.values(dbUsers));
-    // const dbUser = await User.findOne({ email: dbUsers.branStark.email });
+    const dbUser = await User.findOne({ email: dbUsers.jonSnow.email });
 
-    // token = await User.generateToken(dbUser.transform());
+    token = await createToken(dbUser as IUserDocument);
   });
 
   describe('Mutation.signup', () => {
@@ -110,6 +112,7 @@ describe('User resolvers', () => {
       );
     });
   });
+
   describe('Mutation.signin', () => {
     const query: string = `
       mutation($email: String!, $password: String!) {
@@ -188,6 +191,51 @@ describe('User resolvers', () => {
       const { body: response } = await request
         .post('/')
         .send({ query, variables });
+
+      expect(response).toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: 'Not authorized',
+            }),
+          ],
+        }),
+      );
+    });
+  });
+
+  describe('Query.me', () => {
+    const query: string = `
+     {
+        me {
+          id
+          email
+          name
+          roles
+        }
+      }
+    `;
+
+    it('Should return logged user', async () => {
+      const { body: response } = await request
+        .post('/')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ query });
+
+      expect(response).toEqual({
+        data: {
+          me: {
+            id: expect.any(String),
+            name: dbUsers.jonSnow.name,
+            email: dbUsers.jonSnow.email,
+            roles: dbUsers.jonSnow.roles,
+          },
+        },
+      });
+    });
+
+    it('Should return error when user not loggedIn', async () => {
+      const { body: response } = await request.post('/').send({ query });
 
       expect(response).toEqual(
         expect.objectContaining({

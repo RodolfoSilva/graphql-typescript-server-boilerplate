@@ -18,8 +18,11 @@ export interface IAuthPayload {
   user: IUserDocument;
 }
 
+export const createToken = (user: IUserDocument): string =>
+  jwt.sign({ userId: user.id }, APP_SECRET);
+
 const createAuthPayload = (user: IUserDocument) => {
-  const accessToken: string = jwt.sign({ userId: user.id }, APP_SECRET);
+  const accessToken: string = createToken(user);
   const { iat } = jwt.decode(accessToken) as { iat: number };
 
   return {
