@@ -1,24 +1,14 @@
 import createDebug, { IDebugger } from 'debug';
 import mongoose from 'mongoose';
+import * as vars from './vars';
 
 const debug: IDebugger = createDebug('server');
 
-const { MONGO_URI, NODE_ENV } = process.env as {
-  MONGO_URI: string;
-  NODE_ENV: string;
-};
-
-if (!NODE_ENV) {
-  throw new Error(
-    'The NODE_ENV environment variable is required but was not specified.',
-  );
-}
-
 mongoose.Promise = global.Promise;
 
-if (NODE_ENV !== 'test') {
+if (!vars.isTest) {
   mongoose.connection.on('connected', () =>
-    debug(`Mongoose default connection open to ${MONGO_URI}`),
+    debug(`Mongoose default connection open to ${vars.mongo}`),
   );
 
   mongoose.connection.on('disconnected', () =>
@@ -38,20 +28,14 @@ if (NODE_ENV !== 'test') {
   });
 }
 
-if (NODE_ENV === 'development') {
+if (vars.isDevelopment) {
   mongoose.set('debug', true);
 }
 
 mongoose.set('useCreateIndex', true);
 
-if (!MONGO_URI) {
-  throw new Error(
-    'The MONGO_URI environment variable is required but was not specified.',
-  );
-}
-
 mongoose.connect(
-  MONGO_URI,
+  vars.mongo,
   {
     keepAlive: 1,
     useNewUrlParser: true,

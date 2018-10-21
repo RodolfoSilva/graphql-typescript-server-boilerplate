@@ -2,7 +2,7 @@ import { GraphQLServer } from 'graphql-yoga';
 import { Props } from 'graphql-yoga/dist/types';
 import path from 'path';
 
-import './config/env';
+import './config/vars';
 
 import './config/mongoose';
 import resolvers from './graphql/resolvers';

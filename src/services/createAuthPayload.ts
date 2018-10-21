@@ -1,13 +1,6 @@
 import * as jwt from 'jsonwebtoken';
 import { IUserDocument } from '../models/user.model';
-
-const { APP_SECRET } = process.env as { APP_SECRET: string };
-
-if (!APP_SECRET) {
-  throw new Error(
-    'The APP_SECRET environment variable is required but was not specified.',
-  );
-}
+import * as vars from '../config/vars';
 
 export interface IAuthPayload {
   token: {
@@ -19,7 +12,7 @@ export interface IAuthPayload {
 }
 
 export const createToken = (user: IUserDocument): string =>
-  jwt.sign({ userId: user.id }, APP_SECRET);
+  jwt.sign({ userId: user.id }, vars.appSecret);
 
 const createAuthPayload = (user: IUserDocument) => {
   const accessToken: string = createToken(user);
