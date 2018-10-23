@@ -12,6 +12,8 @@
     "test": "jest"
   },
   "dependencies": {
+    "apollo-errors": "^1.9.0",
+    "apollo-resolvers": "^1.4.1",
     "bcryptjs": "^2.4.3",
     "cron": "^1.4.1",
     "debug": "^4.1.0",

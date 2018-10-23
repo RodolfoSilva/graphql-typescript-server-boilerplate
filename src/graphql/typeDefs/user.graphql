@@ -3,8 +3,8 @@ type Query {
 }
 
 type Mutation {
-  signin(email: String!, password: String!): AuthPayload!
-  signup(name: String, email: String!, password: String!, roles: [String!]!): AuthPayload!
+  signIn(email: String!, password: String!): AuthPayload!
+  signUp(name: String, email: String!, password: String!, roles: [String!]!): AuthPayload!
 }
 
 type OAuth {

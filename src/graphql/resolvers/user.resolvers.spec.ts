@@ -54,10 +54,10 @@ describe('User resolvers', () => {
     token = await createToken(dbUser as IUserDocument);
   });
 
-  describe('Mutation.signup', () => {
+  describe('Mutation.signUp', () => {
     const query: string = `
       mutation($name: String, $email: String!, $password: String!, $roles: [String!]!) {
-        signup(name: $name, email: $email, password: $password, roles: $roles) {
+        signUp(name: $name, email: $email, password: $password, roles: $roles) {
           token {
             access_token
             expires_in
@@ -82,7 +82,7 @@ describe('User resolvers', () => {
 
       expect(response).toEqual({
         data: {
-          signup: {
+          signUp: {
             token: {
               access_token: expect.any(String),
               expires_in: expect.any(Number),
@@ -120,10 +120,10 @@ describe('User resolvers', () => {
     });
   });
 
-  describe('Mutation.signin', () => {
+  describe('Mutation.signIn', () => {
     const query: string = `
       mutation($email: String!, $password: String!) {
-        signin(email: $email, password: $password) {
+        signIn(email: $email, password: $password) {
           token {
             access_token
             expires_in
@@ -151,7 +151,7 @@ describe('User resolvers', () => {
 
       expect(response).toEqual({
         data: {
-          signin: {
+          signIn: {
             token: {
               access_token: expect.any(String),
               expires_in: expect.any(Number),
@@ -182,7 +182,7 @@ describe('User resolvers', () => {
         expect.objectContaining({
           errors: [
             expect.objectContaining({
-              message: 'Not authorized',
+              message: 'You are not authorized.',
             }),
           ],
         }),
@@ -203,7 +203,7 @@ describe('User resolvers', () => {
         expect.objectContaining({
           errors: [
             expect.objectContaining({
-              message: 'Not authorized',
+              message: 'You are not authorized.',
             }),
           ],
         }),
@@ -248,7 +248,7 @@ describe('User resolvers', () => {
         expect.objectContaining({
           errors: [
             expect.objectContaining({
-              message: 'Not authorized',
+              message: 'You are not authorized.',
             }),
           ],
         }),
@@ -268,7 +268,7 @@ describe('User resolvers', () => {
         expect.objectContaining({
           errors: [
             expect.objectContaining({
-              message: 'Not authorized',
+              message: 'You are not authorized.',
             }),
           ],
         }),

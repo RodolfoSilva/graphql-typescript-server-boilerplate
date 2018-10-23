@@ -11,8 +11,9 @@ import customRoutes from './routes';
 import authMiddleware from './middlewares/auth';
 
 const graphqlServerProps: Props = {
-  context: req => ({
+  context: (req: any) => ({
     ...req,
+    user: req.request.user,
   }),
   resolvers,
   typeDefs: path.join(__dirname, './graphql/schema.graphql'),
