@@ -6,7 +6,7 @@ import {
   IAuthPayload,
 } from '../../services/createAuthPayload';
 import getLoggedUser from '../../services/getLoggedUser';
-import { IContext } from '../types/Context';
+import { IContext } from '../types/IContext';
 
 export default {
   Mutation: {

@@ -1,13 +1,9 @@
-import { Types } from 'mongoose';
 import { AuthError } from '../errors/AuthError';
-import { IContext } from '../graphql/types/Context';
-import { User } from '../models';
+import { IContext } from '../graphql/types/IContext';
 import { IUserDocument } from '../models/user.model';
-import getLoggedUserId from './getLoggedUserId';
 
 const getLoggedUser = async (context: IContext): Promise<IUserDocument> => {
-  const userId: Types.ObjectId = getLoggedUserId(context);
-  const user: IUserDocument | null = await User.findById(userId);
+  const user: IUserDocument | undefined = context.request.user;
 
   if (!user) {
     throw new AuthError();

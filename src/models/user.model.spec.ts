@@ -1,6 +1,6 @@
-import faker from 'faker';
 import User from './user.model';
 import '../testServer';
+import { createFakeEmail, createFakePersonName } from '../utils/testHelpers';
 
 describe('UserModel', () => {
   let dbUsers: any;
@@ -20,14 +20,14 @@ describe('UserModel', () => {
 
     dbUsers = {
       branStark: {
-        email: faker.internet.email(faker.name.findName()).toLowerCase(),
-        name: faker.name.findName(),
+        email: createFakeEmail(),
+        name: createFakePersonName(),
         password: passwordHashed,
         roles: ['user'],
       },
       jonSnow: {
-        email: faker.internet.email(faker.name.findName()).toLowerCase(),
-        name: faker.name.findName(),
+        email: createFakeEmail(),
+        name: createFakePersonName(),
         password: passwordHashed,
         roles: ['admin'],
       },
@@ -56,7 +56,7 @@ describe('UserModel', () => {
     });
 
     it('Should return null when a email not exists', async () => {
-      const user = await User.getByEmail('ctxls@caspadian.com');
+      const user = await User.getByEmail(createFakeEmail());
       expect(user).toBeNull();
     });
   });
@@ -93,7 +93,7 @@ describe('UserModel', () => {
 
     it('Should return null when a email is invalid', async () => {
       const user = await User.getByEmailAndPassword(
-        'ctxls@caspadian.com',
+        createFakeEmail(),
         password,
       );
       expect(user).toBeNull();

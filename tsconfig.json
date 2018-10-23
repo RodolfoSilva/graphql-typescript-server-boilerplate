@@ -13,7 +13,6 @@
 
     "noImplicitAny": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
     "noImplicitReturns": true,
 
     "removeComments": true,

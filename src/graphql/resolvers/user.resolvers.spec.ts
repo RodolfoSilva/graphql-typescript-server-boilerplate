@@ -1,9 +1,9 @@
-import faker from 'faker';
 import superTest from 'supertest';
 import { User } from '../../models';
 import { IUserDocument } from '../../models/user.model';
 import { createToken } from '../../services/createAuthPayload';
 import serverInstance from '../../testServer';
+import { createFakeEmail, createFakePersonName } from '../../utils/testHelpers';
 
 const request = superTest(serverInstance);
 
@@ -28,22 +28,22 @@ describe('User resolvers', () => {
     }
     dbUsers = {
       branStark: {
-        email: faker.internet.email(faker.name.findName()).toLowerCase(),
-        name: faker.name.findName(),
+        email: createFakeEmail(),
+        name: createFakePersonName(),
         password: passwordHashed,
         roles: ['user'],
       },
       jonSnow: {
-        email: faker.internet.email(faker.name.findName()).toLowerCase(),
-        name: faker.name.findName(),
+        email: createFakeEmail(),
+        name: createFakePersonName(),
         password: passwordHashed,
         roles: ['admin'],
       },
     };
 
     user = {
-      email: 'contato@rodolfosilva.com',
-      name: 'Rodolfo Silva',
+      email: createFakeEmail(),
+      name: createFakePersonName(),
       password,
       roles: ['admin'],
     };
@@ -170,7 +170,7 @@ describe('User resolvers', () => {
 
     it('Should return error when email not exists', async () => {
       const variables = {
-        email: 'invalid-user@email.com',
+        email: createFakeEmail(),
         password,
       };
 

@@ -8,6 +8,7 @@ import './config/mongoose';
 import resolvers from './graphql/resolvers';
 import './models';
 import customRoutes from './routes';
+import authMiddleware from './middlewares/auth';
 
 const graphqlServerProps: Props = {
   context: req => ({
@@ -18,6 +19,8 @@ const graphqlServerProps: Props = {
 };
 
 const app = new GraphQLServer(graphqlServerProps);
+
+app.use(authMiddleware);
 
 app.use(customRoutes);
 
