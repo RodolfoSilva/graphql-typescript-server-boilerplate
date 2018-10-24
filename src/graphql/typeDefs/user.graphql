@@ -5,6 +5,7 @@ type Query {
 type Mutation {
   signIn(email: String!, password: String!): AuthPayload!
   signUp(name: String, email: String!, password: String!, roles: [String!]!): AuthPayload!
+  removeUser(id: ID!): Boolean!
 }
 
 type OAuth {

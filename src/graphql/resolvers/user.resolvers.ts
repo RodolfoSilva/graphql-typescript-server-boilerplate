@@ -5,7 +5,11 @@ import {
   IAuthPayload,
 } from '../../services/createAuthPayload';
 import { IContext } from '../types/IContext';
-import { baseResolver, isAuthenticatedResolver } from './common';
+import {
+  baseResolver,
+  isAdminResolver,
+  isAuthenticatedResolver,
+} from './common';
 import { AuthorizationError } from '../errors/AuthorizationError';
 import { EmailAlreadyExistsError } from '../errors/EmailAlreadyExistsError';
 
@@ -51,10 +55,16 @@ const meResolver = async (
   { user }: IContext,
 ): Promise<IUserDocument | undefined> => user;
 
+const removeUserResolver = async (_: any, { id }: any): Promise<boolean> => {
+  await User.findOneAndDelete({ _id: id });
+  return true;
+};
+
 export default {
   Mutation: {
     signIn: baseResolver.createResolver(signInResolver),
     signUp: baseResolver.createResolver(signUpResolver),
+    removeUser: isAdminResolver.createResolver(removeUserResolver),
   },
   Query: {
     me: isAuthenticatedResolver.createResolver(meResolver),

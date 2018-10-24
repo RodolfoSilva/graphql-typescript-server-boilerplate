@@ -4,6 +4,7 @@ import { IUserDocument } from '../../models/user.model';
 import { createToken } from '../../services/createAuthPayload';
 import serverInstance from '../../testServer';
 import { createFakeEmail, createFakePersonName } from '../../utils/testHelpers';
+import { Types } from 'mongoose';
 
 const request = superTest(serverInstance);
 
@@ -28,6 +29,12 @@ describe('User resolvers', () => {
     }
     dbUsers = {
       branStark: {
+        email: createFakeEmail(),
+        name: createFakePersonName(),
+        password: passwordHashed,
+        roles: ['user'],
+      },
+      ariaStark: {
         email: createFakeEmail(),
         name: createFakePersonName(),
         password: passwordHashed,
@@ -206,6 +213,117 @@ describe('User resolvers', () => {
               message: 'You are not authorized.',
             }),
           ],
+        }),
+      );
+    });
+  });
+
+  describe('Mutation.removeUser', () => {
+    const query: string = `
+      mutation($id: ID!) {
+        removeUser(id: $id)
+      }
+    `;
+
+    it('Should return error when user not loggedIn', async () => {
+      const dbUser = (await User.findOne({
+        email: dbUsers.jonSnow.email,
+      })) as IUserDocument;
+      const variables = {
+        id: dbUser._id,
+      };
+      const { body: response } = await request
+        .post('/')
+        .send({ query, variables });
+
+      expect(response).toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: 'You are not authorized.',
+            }),
+          ],
+        }),
+      );
+    });
+
+    it('Should return error when user not is admin', async () => {
+      const [branStark, ariaStark] = await Promise.all([
+        User.findOne({ email: dbUsers.branStark.email }).exec() as Promise<
+          IUserDocument
+        >,
+        User.findOne({ email: dbUsers.ariaStark.email }).exec() as Promise<
+          IUserDocument
+        >,
+      ]);
+
+      const branStarkToken: string = await createToken(
+        branStark as IUserDocument,
+      );
+
+      const variables = {
+        id: ariaStark._id,
+      };
+
+      const { body: response } = await request
+        .post('/')
+        .set('Authorization', `Bearer ${branStarkToken}`)
+        .send({ query, variables });
+
+      expect(response).toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: 'You are not allowed to do this.',
+            }),
+          ],
+        }),
+      );
+    });
+
+    it('Should remove a user', async () => {
+      const dbUser = (await User.findOne({
+        email: dbUsers.jonSnow.email,
+      })) as IUserDocument;
+      const variables = {
+        id: dbUser._id,
+      };
+
+      const { body: response } = await request
+        .post('/')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ query, variables });
+
+      expect(response).toEqual(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            removeUser: true,
+          }),
+        }),
+      );
+
+      const result = (await User.findOne({
+        email: dbUsers.jonSnow.email,
+      })) as IUserDocument;
+
+      expect(result).toBeNull();
+    });
+
+    it('Should return true whe user not exists', async () => {
+      const variables = {
+        id: new Types.ObjectId(),
+      };
+
+      const { body: response } = await request
+        .post('/')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ query, variables });
+
+      expect(response).toEqual(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            removeUser: true,
+          }),
         }),
       );
     });
