@@ -56,7 +56,7 @@ const meResolver = async (
 ): Promise<IUserDocument | undefined> => user;
 
 const removeUserResolver = async (_: any, { id }: any): Promise<boolean> => {
-  await User.findOneAndDelete({ _id: id });
+  await User.findByIdAndDelete(id);
   return true;
 };
 
@@ -77,12 +77,32 @@ const createUserResolver = async (
   });
 };
 
+const updateUserResolver = async (
+  _: any,
+  { id, ...rest }: any,
+): Promise<IUserDocument | null> => {
+  if (
+    rest.email !== undefined &&
+    (await User.findOne({
+      _id: { $ne: id },
+      email: new RegExp(`^${rest.email}$`, 'i'),
+    }))
+  ) {
+    throw new EmailAlreadyExistsError({
+      message: `Has an user registered with this email: ${rest.email}`,
+    });
+  }
+
+  return await User.findByIdAndUpdate(id, { $set: { ...rest } }, { new: true });
+};
+
 export default {
   Mutation: {
     signIn: baseResolver.createResolver(signInResolver),
     signUp: baseResolver.createResolver(signUpResolver),
     removeUser: isAdminResolver.createResolver(removeUserResolver),
     createUser: isAdminResolver.createResolver(createUserResolver),
+    updateUser: isAdminResolver.createResolver(updateUserResolver),
   },
   Query: {
     me: isAuthenticatedResolver.createResolver(meResolver),

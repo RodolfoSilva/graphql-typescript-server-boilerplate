@@ -311,6 +311,132 @@ describe('User resolvers', () => {
     });
   });
 
+  describe('Mutation.updateUser', () => {
+    const query: string = `
+      mutation($id: ID!, $name: String, $email: String, $roles: [String!]) {
+        updateUser(id: $id, name: $name, email: $email, roles: $roles) {
+          id
+          email
+          name
+          roles
+        }
+      }
+    `;
+
+    it('Should return error when user not loggedIn', async () => {
+      const branStark = (await User.findOne({
+        email: dbUsers.branStark.email,
+      }).exec()) as IUserDocument;
+
+      const variables = {
+        id: branStark.id,
+        email: branStark.email,
+        name: createFakePersonName(),
+      };
+
+      const { body: response } = await request
+        .post('/')
+        .send({ query, variables });
+
+      expect(response).toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: 'You are not authorized.',
+            }),
+          ],
+        }),
+      );
+    });
+
+    it('Should return error when user not is admin', async () => {
+      const branStark = (await User.findOne({
+        email: dbUsers.branStark.email,
+      }).exec()) as IUserDocument;
+
+      const variables = {
+        id: branStark.id,
+        email: branStark.email,
+        name: createFakePersonName(),
+      };
+
+      const branStarkToken: string = await createToken(
+        branStark as IUserDocument,
+      );
+
+      const { body: response } = await request
+        .post('/')
+        .set('Authorization', `Bearer ${branStarkToken}`)
+        .send({ query, variables });
+
+      expect(response).toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: 'You are not allowed to do this.',
+            }),
+          ],
+        }),
+      );
+    });
+
+    it('Should update the user', async () => {
+      const branStark = (await User.findOne({
+        email: dbUsers.branStark.email,
+      }).exec()) as IUserDocument;
+
+      const variables = {
+        id: branStark.id,
+        name: createFakePersonName(),
+      };
+
+      const { body: response } = await request
+        .post('/')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ query, variables });
+
+      expect(response).toEqual({
+        data: {
+          updateUser: {
+            id: branStark.id,
+            name: variables.name,
+            email: branStark.email,
+            roles: expect.arrayContaining(branStark.roles),
+          },
+        },
+      });
+    });
+
+    it('Should return error when email already exists', async () => {
+      const branStark = (await User.findOne({
+        email: dbUsers.branStark.email,
+      }).exec()) as IUserDocument;
+
+      const variables = {
+        id: branStark.id,
+        email: dbUsers.jonSnow.email,
+        name: createFakePersonName(),
+      };
+
+      const { body: response } = await request
+        .post('/')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ query, variables });
+
+      expect(response).toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: `Has an user registered with this email: ${
+                variables.email
+              }`,
+            }),
+          ],
+        }),
+      );
+    });
+  });
+
   describe('Mutation.removeUser', () => {
     const query: string = `
       mutation($id: ID!) {
