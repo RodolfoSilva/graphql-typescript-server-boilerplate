@@ -60,11 +60,29 @@ const removeUserResolver = async (_: any, { id }: any): Promise<boolean> => {
   return true;
 };
 
+const createUserResolver = async (
+  _: any,
+  { password, email, ...props }: any,
+): Promise<IUserDocument> => {
+  if (await User.getByEmail(email)) {
+    throw new EmailAlreadyExistsError({
+      message: `Has an user registered with this email: ${email}`,
+    });
+  }
+
+  return await User.create({
+    email,
+    password: await User.generatePasswordHash(password),
+    ...props,
+  });
+};
+
 export default {
   Mutation: {
     signIn: baseResolver.createResolver(signInResolver),
     signUp: baseResolver.createResolver(signUpResolver),
     removeUser: isAdminResolver.createResolver(removeUserResolver),
+    createUser: isAdminResolver.createResolver(createUserResolver),
   },
   Query: {
     me: isAuthenticatedResolver.createResolver(meResolver),

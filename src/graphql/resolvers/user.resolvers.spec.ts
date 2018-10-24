@@ -218,6 +218,99 @@ describe('User resolvers', () => {
     });
   });
 
+  describe('Mutation.createUser', () => {
+    const query: string = `
+      mutation($name: String, $email: String!, $password: String!, $roles: [String!]!) {
+        createUser(name: $name, email: $email, password: $password, roles: $roles) {
+          id
+          email
+          name
+          roles
+        }
+      }
+    `;
+
+    it('Should return error when user not loggedIn', async () => {
+      const { body: response } = await request
+        .post('/')
+        .send({ query, variables: user });
+
+      expect(response).toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: 'You are not authorized.',
+            }),
+          ],
+        }),
+      );
+    });
+
+    it('Should return error when user not is admin', async () => {
+      const branStark = (await User.findOne({
+        email: dbUsers.branStark.email,
+      }).exec()) as IUserDocument;
+
+      const branStarkToken: string = await createToken(
+        branStark as IUserDocument,
+      );
+
+      const { body: response } = await request
+        .post('/')
+        .set('Authorization', `Bearer ${branStarkToken}`)
+        .send({ query, variables: user });
+
+      expect(response).toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: 'You are not allowed to do this.',
+            }),
+          ],
+        }),
+      );
+    });
+
+    it('Should create a user', async () => {
+      const { body: response } = await request
+        .post('/')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ query, variables: user });
+
+      expect(response).toEqual({
+        data: {
+          createUser: {
+            id: expect.any(String),
+            name: user.name,
+            email: user.email,
+            roles: user.roles,
+          },
+        },
+      });
+    });
+
+    it('Should return error when email already exists', async () => {
+      const variables = dbUsers.jonSnow;
+
+      const { body: response } = await request
+        .post('/')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ query, variables });
+
+      expect(response).toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: `Has an user registered with this email: ${
+                variables.email
+              }`,
+            }),
+          ],
+        }),
+      );
+    });
+  });
+
   describe('Mutation.removeUser', () => {
     const query: string = `
       mutation($id: ID!) {
