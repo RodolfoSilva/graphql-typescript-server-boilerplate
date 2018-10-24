@@ -353,10 +353,13 @@ describe('User resolvers', () => {
       const branStark = (await User.findOne({
         email: dbUsers.branStark.email,
       }).exec()) as IUserDocument;
+      const jonSnow = (await User.findOne({
+        email: dbUsers.jonSnow.email,
+      }).exec()) as IUserDocument;
 
       const variables = {
-        id: branStark.id,
-        email: branStark.email,
+        id: jonSnow.id,
+        email: jonSnow.email,
         name: createFakePersonName(),
       };
 
@@ -378,6 +381,38 @@ describe('User resolvers', () => {
           ],
         }),
       );
+    });
+
+    it('Should update user when user not is an admin but is the same edited user', async () => {
+      const branStark = (await User.findOne({
+        email: dbUsers.branStark.email,
+      }).exec()) as IUserDocument;
+
+      const variables = {
+        id: branStark.id,
+        email: branStark.email,
+        name: createFakePersonName(),
+      };
+
+      const branStarkToken: string = await createToken(
+        branStark as IUserDocument,
+      );
+
+      const { body: response } = await request
+        .post('/')
+        .set('Authorization', `Bearer ${branStarkToken}`)
+        .send({ query, variables });
+
+      expect(response).toEqual({
+        data: {
+          updateUser: {
+            id: branStark.id,
+            name: variables.name,
+            email: branStark.email,
+            roles: expect.arrayContaining(branStark.roles),
+          },
+        },
+      });
     });
 
     it('Should update the user', async () => {

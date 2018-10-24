@@ -3,6 +3,9 @@ import isEmpty from 'lodash/isEmpty';
 import { Document, model, Model, Schema, SchemaOptions } from 'mongoose';
 import * as vars from '../config/vars';
 
+const ADMIN_ROLE = 'admin';
+const USER_ROLE = 'user';
+
 const generatePasswordHash = async (password: string): Promise<string> => {
   return await bcrypt.hash(password, vars.saltRounds);
 };
@@ -42,7 +45,7 @@ const UserSchema: Schema = new Schema(
     },
     roles: {
       default: [],
-      enum: ['user', 'admin'],
+      enum: [USER_ROLE, ADMIN_ROLE],
       required: true,
       type: [String],
     },
@@ -59,6 +62,7 @@ export interface IUserDocument extends Document {
 }
 
 export interface IUserModel extends Model<IUserDocument> {
+  isAdmin: (user: IUserDocument) => boolean;
   getByEmail: (email: string) => Promise<IUserDocument | null>;
   getByEmailAndPassword: (
     email: string,
@@ -87,6 +91,9 @@ UserSchema.statics.getByEmail = async function getByEmail(
     '+password',
   );
 };
+
+UserSchema.statics.isAdmin = (user: IUserDocument): boolean =>
+  user.roles.includes(ADMIN_ROLE);
 
 UserSchema.statics.getByEmailAndPassword = async function getByEmailAndPassword(
   email: string,

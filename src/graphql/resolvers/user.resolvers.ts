@@ -12,6 +12,15 @@ import {
 } from './common';
 import { AuthorizationError } from '../errors/AuthorizationError';
 import { EmailAlreadyExistsError } from '../errors/EmailAlreadyExistsError';
+import { ForbiddenError } from '../errors/ForbiddenError';
+
+export const isAdminOrOwneUserResolver = isAuthenticatedResolver.createResolver(
+  (root, args, { user }) => {
+    if (!User.isAdmin(user) && args.id !== user.id.toString()) {
+      throw new ForbiddenError();
+    }
+  },
+);
 
 const signInResolver = async (
   _: any,
@@ -100,9 +109,9 @@ export default {
   Mutation: {
     signIn: baseResolver.createResolver(signInResolver),
     signUp: baseResolver.createResolver(signUpResolver),
-    removeUser: isAdminResolver.createResolver(removeUserResolver),
     createUser: isAdminResolver.createResolver(createUserResolver),
-    updateUser: isAdminResolver.createResolver(updateUserResolver),
+    updateUser: isAdminOrOwneUserResolver.createResolver(updateUserResolver),
+    removeUser: isAdminOrOwneUserResolver.createResolver(removeUserResolver),
   },
   Query: {
     me: isAuthenticatedResolver.createResolver(meResolver),
