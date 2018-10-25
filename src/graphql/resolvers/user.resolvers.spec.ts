@@ -5,6 +5,7 @@ import { createToken } from '../../services/createAuthPayload';
 import serverInstance from '../../testServer';
 import { createFakeEmail, createFakePersonName } from '../../utils/testHelpers';
 import { Types } from 'mongoose';
+import uuid from 'uuid/v4';
 
 const request = superTest(serverInstance);
 
@@ -467,6 +468,124 @@ describe('User resolvers', () => {
               }`,
             }),
           ],
+        }),
+      );
+    });
+  });
+
+  describe('Mutation.changeUserPassword', () => {
+    const query: string = `
+      mutation($id: ID!, $password: String!) {
+        changeUserPassword(id: $id, password: $password)
+      }
+    `;
+
+    it('Should return error when user not loggedIn', async () => {
+      const branStark = (await User.findOne({
+        email: dbUsers.branStark.email,
+      }).exec()) as IUserDocument;
+
+      const variables = {
+        id: branStark.id,
+        password: uuid(),
+      };
+
+      const { body: response } = await request
+        .post('/')
+        .send({ query, variables });
+
+      expect(response).toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: 'You are not authorized.',
+            }),
+          ],
+        }),
+      );
+    });
+
+    it('Should return error when user not is admin', async () => {
+      const branStark = (await User.findOne({
+        email: dbUsers.branStark.email,
+      }).exec()) as IUserDocument;
+      const jonSnow = (await User.findOne({
+        email: dbUsers.jonSnow.email,
+      }).exec()) as IUserDocument;
+
+      const variables = {
+        id: jonSnow.id,
+        password: uuid(),
+      };
+
+      const branStarkToken: string = await createToken(
+        branStark as IUserDocument,
+      );
+
+      const { body: response } = await request
+        .post('/')
+        .set('Authorization', `Bearer ${branStarkToken}`)
+        .send({ query, variables });
+
+      expect(response).toEqual(
+        expect.objectContaining({
+          errors: [
+            expect.objectContaining({
+              message: 'You are not allowed to do this.',
+            }),
+          ],
+        }),
+      );
+    });
+
+    it('Should update user when user not is an admin but is the same edited user', async () => {
+      const branStark = (await User.findOne({
+        email: dbUsers.branStark.email,
+      }).exec()) as IUserDocument;
+
+      const variables = {
+        id: branStark.id,
+        password: uuid(),
+      };
+
+      const branStarkToken: string = await createToken(
+        branStark as IUserDocument,
+      );
+
+      const { body: response } = await request
+        .post('/')
+        .set('Authorization', `Bearer ${branStarkToken}`)
+        .send({ query, variables });
+
+      expect(response).toEqual(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            changeUserPassword: true,
+          }),
+        }),
+      );
+    });
+
+    it('Should change an user password', async () => {
+      const branStark = (await User.findOne({
+        email: dbUsers.branStark.email,
+      }).exec()) as IUserDocument;
+
+      const variables = {
+        id: branStark.id,
+        password: uuid(),
+      };
+
+      const { body: response } = await request
+        .post('/')
+        .set('Authorization', `Bearer ${token}`)
+        .send({ query, variables });
+
+      expect(response).toEqual(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            changeUserPassword: true,
+          }),
         }),
       );
     });

@@ -105,6 +105,19 @@ const updateUserResolver = async (
   return await User.findByIdAndUpdate(id, { $set: { ...rest } }, { new: true });
 };
 
+const changeUserPasswordResolver = async (
+  _: any,
+  { id, password }: any,
+): Promise<boolean> => {
+  const user: IUserDocument | null = await User.findById(id);
+
+  user!.password = await User.generatePasswordHash(password);
+
+  await user!.save();
+
+  return true;
+};
+
 export default {
   Mutation: {
     signIn: baseResolver.createResolver(signInResolver),
@@ -112,6 +125,9 @@ export default {
     createUser: isAdminResolver.createResolver(createUserResolver),
     updateUser: isAdminOrOwneUserResolver.createResolver(updateUserResolver),
     removeUser: isAdminOrOwneUserResolver.createResolver(removeUserResolver),
+    changeUserPassword: isAdminOrOwneUserResolver.createResolver(
+      changeUserPasswordResolver,
+    ),
   },
   Query: {
     me: isAuthenticatedResolver.createResolver(meResolver),
