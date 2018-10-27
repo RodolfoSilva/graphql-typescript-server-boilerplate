@@ -16,6 +16,23 @@
 * Express routes
 * Integration with mongoose
 
+## Running
+
+1. Create a .env.local file with a mongodb URI
+
+```
+MONGO_URI=mongodb://mongodb/myDatabase
+```
+
+2. Run with docker
+
+```
+docker-compose up
+```
+
+3. Access: `http://localhost:4001`
+
+
 ## Contributing
 
 Issues and Pull Requests are always welcome.
