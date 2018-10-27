@@ -1,0 +1,13 @@
+version: '3'
+services:
+  api:
+    build: .
+    environment:
+      NODE_ENV: 'development'
+      PORT: 4001
+    links:
+      - mongo
+    ports:
+     - "4001:4001"
+  mongo:
+    image: mongo
