@@ -4,7 +4,7 @@ type Query {
 
 type Mutation {
   signIn(email: String!, password: String!): AuthPayload!
-  signUp(name: String, email: String!, password: String!, roles: [String!]!): AuthPayload!
+  signUp(name: String, email: String!, password: String!): AuthPayload!
   createUser(name: String, email: String!, password: String!, roles: [String!]!): User!
   updateUser(id: ID!, name: String, email: String, roles: [String!]): User!
   changeUserPassword(id: ID!, password: String!): Boolean!

@@ -40,7 +40,7 @@ const signInResolver = async (
 
 const signUpResolver = async (
   _: any,
-  { name, email, password, roles }: any,
+  { name, email, password }: any,
 ): Promise<IAuthPayload> => {
   if (await User.getByEmail(email)) {
     throw new EmailAlreadyExistsError({
@@ -52,7 +52,6 @@ const signUpResolver = async (
     email,
     name,
     password: await User.generatePasswordHash(password),
-    roles,
   });
 
   return createAuthPayload(user);
