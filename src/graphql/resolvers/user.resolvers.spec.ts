@@ -1,6 +1,6 @@
 import superTest from 'supertest';
 import { User } from '../../models';
-import { IUserDocument } from '../../models/user.model';
+import { IUserDocument, USER_ROLE } from '../../models/user.model';
 import { createToken } from '../../services/createAuthPayload';
 import serverInstance from '../../testServer';
 import { createFakeEmail, createFakePersonName } from '../../utils/testHelpers';
@@ -64,8 +64,8 @@ describe('User resolvers', () => {
 
   describe('Mutation.signUp', () => {
     const query: string = `
-      mutation($name: String, $email: String!, $password: String!, $roles: [String!]!) {
-        signUp(name: $name, email: $email, password: $password, roles: $roles) {
+      mutation($name: String, $email: String!, $password: String!) {
+        signUp(name: $name, email: $email, password: $password) {
           token {
             access_token
             expires_in
@@ -100,7 +100,7 @@ describe('User resolvers', () => {
               id: expect.any(String),
               name: variables.name,
               email: variables.email,
-              roles: variables.roles,
+              roles: [USER_ROLE],
             },
           },
         },

@@ -3,8 +3,8 @@ import isEmpty from 'lodash/isEmpty';
 import { Document, model, Model, Schema, SchemaOptions } from 'mongoose';
 import * as vars from '../config/vars';
 
-const ADMIN_ROLE = 'admin';
-const USER_ROLE = 'user';
+export const ADMIN_ROLE = 'admin';
+export const USER_ROLE = 'user';
 
 const generatePasswordHash = async (password: string): Promise<string> => {
   return await bcrypt.hash(password, vars.saltRounds);
@@ -44,7 +44,7 @@ const UserSchema: Schema = new Schema(
       type: String,
     },
     roles: {
-      default: [],
+      default: [USER_ROLE],
       enum: [USER_ROLE, ADMIN_ROLE],
       required: true,
       type: [String],
