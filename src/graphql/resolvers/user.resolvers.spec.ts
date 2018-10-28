@@ -1,6 +1,6 @@
 import superTest from 'supertest';
 import { User } from '../../models';
-import { IUserDocument, USER_ROLE } from '../../models/user.model';
+import { IUserDocument, Roles } from '../../models/user.model';
 import { createToken } from '../../services/createAuthPayload';
 import serverInstance from '../../testServer';
 import { createFakeEmail, createFakePersonName } from '../../utils/testHelpers';
@@ -100,7 +100,7 @@ describe('User resolvers', () => {
               id: expect.any(String),
               name: variables.name,
               email: variables.email,
-              roles: [USER_ROLE],
+              roles: [Roles.USER],
             },
           },
         },

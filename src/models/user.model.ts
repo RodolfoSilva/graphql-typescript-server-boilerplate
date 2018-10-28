@@ -3,8 +3,10 @@ import isEmpty from 'lodash/isEmpty';
 import { Document, model, Model, Schema, SchemaOptions } from 'mongoose';
 import * as vars from '../config/vars';
 
-export const ADMIN_ROLE = 'admin';
-export const USER_ROLE = 'user';
+export enum Roles {
+  USER = 'user',
+  ADMIN = 'admin',
+}
 
 const generatePasswordHash = async (password: string): Promise<string> => {
   return await bcrypt.hash(password, vars.saltRounds);
@@ -44,8 +46,8 @@ const UserSchema: Schema = new Schema(
       type: String,
     },
     roles: {
-      default: [USER_ROLE],
-      enum: [USER_ROLE, ADMIN_ROLE],
+      default: [Roles.USER],
+      enum: Object.values(Roles),
       required: true,
       type: [String],
     },
@@ -59,10 +61,10 @@ export interface IUserDocument extends Document {
   password: string;
   roles: string[];
   comparePassword: (password: string) => boolean;
+  isAdmin: boolean;
 }
 
 export interface IUserModel extends Model<IUserDocument> {
-  isAdmin: (user: IUserDocument) => boolean;
   getByEmail: (email: string) => Promise<IUserDocument | null>;
   getByEmailAndPassword: (
     email: string,
@@ -70,6 +72,10 @@ export interface IUserModel extends Model<IUserDocument> {
   ) => Promise<IUserDocument | null>;
   generatePasswordHash: (password: string) => Promise<string>;
 }
+
+UserSchema.virtual('isAdmin').get(function() {
+  return this.roles.includes(Roles.ADMIN);
+});
 
 UserSchema.methods.comparePassword = function comparePassword(
   password: string,
@@ -91,9 +97,6 @@ UserSchema.statics.getByEmail = async function getByEmail(
     '+password',
   );
 };
-
-UserSchema.statics.isAdmin = (user: IUserDocument): boolean =>
-  user.roles.includes(ADMIN_ROLE);
 
 UserSchema.statics.getByEmailAndPassword = async function getByEmailAndPassword(
   email: string,

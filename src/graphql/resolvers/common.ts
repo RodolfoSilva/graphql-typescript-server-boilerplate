@@ -3,7 +3,6 @@ import { isInstance as isApolloErrorInstance } from 'apollo-errors';
 import { UnknownError } from '../errors/UnknownError';
 import { AuthorizationError } from '../errors/AuthorizationError';
 import { ForbiddenError } from '../errors/ForbiddenError';
-import { User } from '../../models';
 
 export const baseResolver = createResolver(
   null,
@@ -22,7 +21,7 @@ export const isAuthenticatedResolver = baseResolver.createResolver(
 
 export const isAdminResolver = isAuthenticatedResolver.createResolver(
   (root, args, { user }) => {
-    if (!User.isAdmin(user)) {
+    if (!user.isAdmin) {
       throw new ForbiddenError();
     }
   },

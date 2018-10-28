@@ -16,7 +16,7 @@ import { ForbiddenError } from '../errors/ForbiddenError';
 
 export const isAdminOrOwneUserResolver = isAuthenticatedResolver.createResolver(
   (root, args, { user }) => {
-    if (!User.isAdmin(user) && args.id !== user.id.toString()) {
+    if (!user.isAdmin && args.id !== user.id.toString()) {
       throw new ForbiddenError();
     }
   },
